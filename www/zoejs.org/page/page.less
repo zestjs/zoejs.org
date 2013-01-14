@@ -1,0 +1,79 @@
+body {
+  margin: 0 !important;
+}
+h1.page-title {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-family: "PT-sans", arial, sans-serif;
+  font-weight: 100;
+  text-transform: uppercase;
+}
+.header {
+  width: 100%;
+  background-color: #202020;
+  position: fixed;
+  font-family: "PT Sans", arial, sans-serif;
+  z-index: 10;
+  
+  .logo {
+    display: block;
+    float: left;
+    text-indent: -1000px;
+    overflow: hidden;
+    margin-left: 12px;
+    background-image: url(zoe-logo.png);
+    height: 28px;
+    margin-top: 4px;
+    width: 66px;
+  }
+  
+  ul.menu {
+    margin: 0;
+    float: right;
+    margin-right: 8em;
+    height: 40px;
+  
+    li {
+      float: left;
+      list-style-type: none;
+    }
+    
+    a {
+      display: block;
+      color: #898989;
+      font-size: 16px;
+      margin: 0 2em;
+      line-height: 40px;
+      vertical-align: middle;
+      text-decoration: none;
+    }
+    a:hover, a.active {
+      color: #BCBCBC;
+    }
+  }
+}
+
+.page-content {
+  padding-top: 40px;
+}
+
+@media screen and (max-width: 1024px), screen and (max-device-width: 1024px) {
+  .header ul.menu {
+    clear: both;
+    float: none;
+    margin: 0;
+    padding: 0;
+    
+    li a {
+      margin: 0 1em 0 12px;
+    }
+  }
+  .page-content {
+    padding-top: 72px;
+  }
+}
+@media screen and (max-width: 800px), screen and (max-device-width: 800px), print {
+  .header ul.menu a {
+    font-size: 12px;
+  }
+}

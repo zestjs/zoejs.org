@@ -1,0 +1,30 @@
+modules: ['cs!$/zoejs.org']
+
+port: 8083
+
+404: 
+  title: 'Page Not Found'
+  body: (o) ->
+    render: '@cs!site/doc-page/doc-page'
+    options:
+      section: ''
+      data: [
+        chapterName: 'Not Found'
+        sections: [
+          sectionName: 'There isn\'t a page called ' + o._url
+          markdown: """
+            [Return to the Homepage](/)
+          """
+        ]
+      ]
+
+browserModules: ['jquery']
+
+require:
+  paths:
+    www: '../'
+    site: '../zoejs.org'
+
+  map:
+    '*':
+      selector: 'jquery'
