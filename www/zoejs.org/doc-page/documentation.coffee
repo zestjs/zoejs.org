@@ -24,7 +24,7 @@ define ['marked', 'is!browser?jquery', 'zoe', 'less!./documentation'], (marked, 
 
   markCache = {}
   mark = (markdown) ->
-    markCache[markdown] or marked markdown
+    markCache[markdown] or (markCache[markdown] = marked markdown)
     
   options:
     # example documentation data object:
