@@ -1,6 +1,7 @@
 modules: ['cs!$/zoejs.org']
 
-port: 8083
+port: 80
+hostname: '176.67.165.252'
 
 404: 
   title: 'Page Not Found'
@@ -21,6 +22,7 @@ port: 8083
 browserModules: ['jquery']
 
 require:
+  waitSeconds: 0
   paths:
     www: '../'
     site: '../zoejs.org'
@@ -28,3 +30,7 @@ require:
   map:
     '*':
       selector: 'jquery'
+
+zestLayer:
+  include: ['cs!site/zoe-docs', 'cs!site/doc-page/documentation.controller', 'cs!site/doc-page/contents.controller']
+  excludeShallow: ['require-css/css-builder', 'require-less/lessc-server']
