@@ -21,6 +21,10 @@ define ['marked', 'is!browser?jquery', 'zoe', 'less!./documentation'], (marked, 
           .replace(/([\w-]+):/gm, '<span class="property">$1</span>:')
       else
         code
+
+  markCache = {}
+  mark = (markdown) ->
+    markCache[markdown] or marked markdown
     
   options:
     # example documentation data object:
@@ -38,7 +42,7 @@ define ['marked', 'is!browser?jquery', 'zoe', 'less!./documentation'], (marked, 
       __ += "<a name='#{content.chapterName}' href='##{content.chapterName}'></a><h1>#{content.chapterName}</h1>"
       for section in content.sections
         __ += "<a name='#{section.sectionName}' href='##{section.sectionName}'></a><h2>#{section.sectionName}</h2>"
-        __ += marked section.markdown
+        __ += mark section.markdown
       __ += "<div class='spacing'></div>"
     __ += "</div>"
     __

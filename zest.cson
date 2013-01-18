@@ -2,6 +2,7 @@ modules: ['cs!$/zoejs.org']
 
 port: 80
 hostname: '176.67.165.252'
+fileExpires: 10000
 
 404: 
   title: 'Page Not Found'
