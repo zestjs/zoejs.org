@@ -46,11 +46,8 @@ Runs in NodeJS, AMD and as a browser global.
 
     // class properties just object properties
     items: ['initial data item'],
-    loadData: function() {
-      this.data = [1, 4, 5];
-    },
     addItem: function(item) {
-      this.data.push(item);
+      this.items.push(item);
     }
   };
 
@@ -65,9 +62,9 @@ Runs in NodeJS, AMD and as a browser global.
       alert('added item ' + item);
     }
   });
-  myModel.loadData();
+
   myModel.addItem(10); // "added item 10"
-  myModel.items; // "['initial data item', 'extra initial data']"
+  myModel.items; // "['initial data item', 'extra initial data', 10]"
 ```
 
 ### Extending a Static Class
