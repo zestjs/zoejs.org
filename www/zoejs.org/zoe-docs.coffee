@@ -42,7 +42,7 @@ zoe.js is provided under the MIT license.
           [Skip to the examples](#Examples)
 
           zoe.js developed out of a need to manage the inheritance of objects and widgets with and without prototypal inheritance.
-          Many JavaScript inheritance systems mimick classical inheritance systems, while
+          Many JavaScript inheritance systems mimic classical inheritance systems, while
           the approach taken here is to create an inheritance model that naturally works with JavaScript objects using extension.
           
           The basic principle is that inheritance is a form of object extension. A core object is extended with a number of implemented definitions. When that
@@ -486,7 +486,7 @@ the prototype is not modified.
   
   Use cases:
   
-  1. Registering an **event** callback means ammending a function to a list of functions
+  1. Registering an **event** callback means amending a function to a list of functions
       to be executed when an event triggers.
   2.  Just like events, any **pub/sub system** is based on adding a callback function to the
       list of functions to be executed on a signal.
