@@ -45,9 +45,8 @@ zoe.js is provided under the MIT license.
           Many JavaScript inheritance systems mimick classical inheritance systems, while
           the approach taken here is to create an inheritance model that naturally works with JavaScript objects using extension.
           
-          The basic principle is that inheritance is a form of object extension. A core object is extended with a number of implemented definitions. When that
-          object is extended, a new object is created implementing the core definitions as well as any new definitions. 
-          This is the inheritance system of [`zoe.create`](#zoe.create).
+          The basic principle is that inheritance is a form of object extension. A new object is created and extended with a number of implemented definitions, 
+          typically followed by a primary definition. This is the inheritance system of [`zoe.create`](#zoe.create).
 
           The inheritance builds from the extension system of [`zoe.extend`](#zoe.extend). This just extends one object with properties from another, but allowing
           for custom extension rules such as replacement, deep extension and combining functions, arrays or strings.
@@ -471,8 +470,10 @@ zoe.Constructor provides this functionality (it's just like the Constructor abov
 When we use the `on` method of `myGreatWhite`, we add a new function to the chain.
 Typically this function chain would be on the object prototype so we would be modifying the prototype.
 By implementing `zoe.InstanceChains`, all prototype function chains are reinstantiated for the instance so that
-the prototype is not modified.
+the prototype is not modified. The `this` reference is also bound to the prototype instance giving them portability
+to be used in other callers (eg `$(someElement).bind('click', this.eat);`).
 
+***
         """
       ]
     ,
