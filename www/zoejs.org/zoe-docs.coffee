@@ -412,7 +412,7 @@ zoe.Constructor provides this functionality (it's just like the Constructor abov
   NativePrototype.prototype.native = true;
 
   var MyPrototype = $z.create([zoe.Constructor, NativePrototype], {
-    constructor: function() {
+    construct: function() {
       alert('constructing zoe prototype');
     },
     prototype: {
