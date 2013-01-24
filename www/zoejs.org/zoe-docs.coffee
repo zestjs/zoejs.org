@@ -911,7 +911,7 @@ zoe.js is provided under the MIT license.
   #### Providing default configuration on a nested configuration object:
   
     ```javascript
-      zoe.extend(config, default_config, zoe.extend.DEEP_FILL);
+      zoe.extend(config, default_config, zoe.extend.DFILL);
     ```
   
   #### Custom extension with automatic type adjustment
