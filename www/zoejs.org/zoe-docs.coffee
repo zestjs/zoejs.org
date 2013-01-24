@@ -62,7 +62,7 @@ zoe.js is provided under the MIT license.
     ,
       chapterName: 'Examples'
       sections: [
-        sectionName: 'Standard Prototypal Inheritance'
+        sectionName: 'Standard JavaScript Constructor'
         markdown: """
 
         > This is a live code example, click **Run** to execute it. You can also edit the code in the window.
