@@ -1,4 +1,4 @@
-define ['cs!./doc-page/doc-page', 'zoe'], (DocPage, zoe) ->
+define ['cs!./doc-page/doc-page', 'zoe', 'zest/com'], (DocPage, zoe) ->
   title: 'zoe.js - Natural JavaScript Inheritance'
   body: DocPage
   options:
@@ -54,426 +54,283 @@ zoe.js is provided under the MIT license.
           When extending a function with another function, you may want to run the functions together as a **function chain**, in the form of [`zoe.fn`](#zoe.fn),
           which also allows for a natural eventing paradigm.
 
-          Prototypal inheritance is provided by the implementor, [`zoe.Constructor`](#zoe.Constructor), and custom functional implementors can also be created.
+          Prototypal inheritance is provided by the implementor, [`zoe.Constructor`](#zoe.Constructor), and custom functional implementors can also be created
+          for functionality such as getters and setters, eventing etc.
         """
       ,
       ]
     ,
       chapterName: 'Examples'
       sections: [
-        sectionName: 'Simple Object Extension'
+        sectionName: 'Standard Prototypal Inheritance'
         markdown: """
 
-> This is a live code example, click **Run** to execute it. You can also edit the code in the window.
-> 
-> To see the actual object, open the browser JavaScript console to inspect it in the logs.
+        > This is a live code example, click **Run** to execute it. You can also edit the code in the window.
+        > 
+        > To see the actual object, open the browser JavaScript console to inspect it in the logs.
 
-```jslive
-  var config = {
-    modules: [
-      { name: 'first', data: 'here' },
-      { name: 'second', data: '' }
-    ],
-    settings: {
-      some_option: 'setting'
-    }
-  };
+        ```jslive
+          var myClass = zoe.create([zoe.Constructor], {
+            staticMethod: function() {
+              return 'static';
+            },
+            construct: function() {
+              this.property = 'value'
+            },
+            prototype: {
+              method: function() {
+                alert('natural prototype method!');
+              }
+            }
+          });
 
-  zoe.extend(config, {
-    modules: [
-      { name: 'new module', data: 'new data' }
-    ],
-    settings: {
-      another_option: 'my_option'
-    }
-  }, 'DAPPEND');
-  
-  // (open up the JS console to see the object)
-  console.log(config); 
-  config.modules[2].name;
-```
+          var classInstance = new myClass();
 
-_Modules list is combined, and the settings is extended._
+          myClass.staticMethod();
+          classInstance.method();
+          classInstance.property;
+        ```
 
-The 'DAPPEND' (Deep Append) rule recursively applies the APPEND rule to all properties.
-
-* The APPEND rule extends objects, concatenates arrays, chains functions and copies other properties.
-* The PREPEND rule soft-extends objects (not replacing properties), pre-concatenates arrays, prechains functions and
-  copies other properties if they aren't already defined.
+        * [`zoe.create`](#zoe.create) acts a factory function, generating the constructor above from the definition object and some definitions to inherit from.
+        * The resultant `myClass` constructor is identical to a standard JavaScript constructor we could have written procedurally.
+        * `myClass` still needs to be instantiated with the `new` keyword. `zoe.create` only generates the constructor itself.
 
         """
       ,
-        sectionName: 'Property-Specific Rule Notation'
+        sectionName: 'Class Inheritance'
         markdown: """
-```jslive
-  var config = {
-    modules: [
-      { name: 'first', data: 'here' },
-      { name: 'second', data: '' }
-    ],
-    settings: {
-      some_option: 'setting'
-    }
-  };
 
-  zoe.extend(config, {
-    __modules: [
-      { name: 'new module', data: 'new data' }
-    ],
-    settings__: {
-      another_option: 'default'
-    }
-  });
+        ```jslive
+          var baseClass = {
+            _implement: [zoe.Constructor],
+            prototype: {
+              method: function() {
+                alert('base class method');
+              }
+            }
+          };
 
-  console.log(config);
-  config.modules[2].name;
-```
+          var myClass = zoe.create([baseClass], {
+            prototype: {
+              newMethod: function() {
+                alert('extended method');
+              }
+            }
+          });
 
-_Modules are concatenated, settings are prepended only setting if the property doesn't already exist._
 
-* &#95;&#95;varName applies the APPEND rule
-* varName&#95;&#95; applies the PREPEND rule 
-* &#95;&#95;varName&#95;&#95; applies the REPLACE rule
+          var classInstance = new myClass();
+          classInstance.method();
+          classInstance.newMethod();
+        ```
+
+        * By writing our constructors using definition objects instead of with procedural code, definitions can be reused and easily extended.
+        * `zoe.create` implements inherited definitions one by one onto the object in turn until the final definition is applied.
+        * Each definition implementation simply extends the object being created, with some extra hooks for flexibility.
+        * The `_implement` property is equivalent to using the Array syntax in zoe.create for inheritors.
+        """
+      ,
+        sectionName: 'Inheritance with Extension Rules'
+        markdown: """
+
+        ```jslive
+          var Ball = {
+            _implement: [zoe.Constructor],
+            _extend: {
+              'prototype.bounce': 'CHAIN'
+            },
+            prototype: {
+              bounce: function() {
+                alert('bouncing');
+              }
+            }
+          };
+
+          var myBall = zoe.create([Ball], {
+            prototype: {
+              bounce: function() {
+                alert('my ball bouncing');
+              }
+            }
+          });
+
+          var ballInstance = new myBall();
+          ballInstance.bounce();
+        ```
+
+        * `_extend` rules specify how to combine properties when extending properties that already exist.
+        * In this case, the extension function [`zoe.extend.CHAIN`](#zoe.extend.CHAIN) is applied when extending the `bounce` property.
+        * `zoe.extend.CHAIN` turns functions into function chains (zoe.fn), which allows them to be executed one after another.
+        * Other extension rules can allow for different execution functions on the chain. For example the [`zoe.extend.CHAIN_ASYNC`](#zoe.extend.CHAIN_ASYNC) 
+          rule allows asynchronous functions to be combined through extension.
+        """
+      ,
+        sectionName: 'The zoe.Constructor Implementor'
+        markdown: """
+
+        ```jslive
+          var Constructor = {
+            _base: function() {
+              return function constructor() {
+                if (constructor.construct)
+                  constructor.construct();
+              }
+            },
+            _extend: {
+              prototype: 'EXTEND',
+              construct: 'CHAIN'
+            }
+          };
+
+          var PrototypeClass = zoe.create([Constructor], {
+            construct: function() {
+              alert('constructing!');
+            },
+            prototype: {
+              my: 'prototype property'
+            }
+          });
+
+          (new PrototypeClass()).my;
+        ```
+
+        * [`zoe.Constructor`](#zoe.Constructor) is identical to the above Constructor, with only 14 additional lines of code.
+        * By providing the extension rules for creating a JavaScript constructor, all future inheritors
+          are able to set the `prototype` and `construct` properties resulting in the expected extension.
+        * `zoe.Constructor` also supports implementing from native JavaScript constructors.
 
         """
       ,
-        sectionName: 'Rule Objects'
+        sectionName: 'Using Function Chains'
         markdown: """
 
-```jslive
+      ```jslive
+        var f = zoe.fn();
 
-  var config = {
-    modules: [
-      { name: 'first', data: {} },
-      { name: 'second', data: {} }
-    ],
-    settings: {
-      some_option: 'setting'
-    }
-  };
+        f.on(function() {
+          alert('first function');
+          return 'last returned value provided';
+        });
+        f.on(function() {
+          alert('second function');
+        });
 
-  zoe.extend(config, {
-    modules: [
-      { name: 'the only module', data: {} }
-    ],
-    settings: {
-      some_option: 'default value',
-      another_option: 'default value'
-    }
-  }, {
-    modules: 'REPLACE',
-    settings: 'PREPEND'
-  });
+        f();
+      ```
 
-  console.log(config);
-  config.modules.length;
-```
+      * [`zoe.fn`](#zoe.fn) generates new instances of function chains.
+      * Function chains are functions which when executed will execute an array of functions.
+      * All function chains provide the `on`, `off` and `first` methods for adding and removing functions to the chain.
+      * By default, function chains use the [`zoe.fn.LAST_DEFINED`](#zoe.fn.LAST_DEFINED) execution function.
+      * Any custom execution function can be provided or created.
+        """
+      ,
+        sectionName: 'Asynchronous Function Chains'
+        markdown: """
 
-_The modules object is replaced, while settings have defaults ensured from the extending object._
+      ```javascript
+        var http = require('http');
+        var zoe = require('zoe');
 
-* The REPLACE rule specifies the property should be directly replaced
-* The PREPEND rule extends an object, only adding a property if it doesn't exist, making it good for setting defaults over existing values.
+        var server = zoe.fn('ASYNC');
 
-### Wildcard Rules
+        server.on(function(req, res, next) {
+          req.middleware = 'middleware';
+          next();
+        });
 
-```jslive
-  var config = {
-    modules: [
-      { name: 'first', data: {} },
-      { name: 'second', data: {} }
-    ],
-    settings: {
-      some_option: 'setting'
-    }
-  };
-  zoe.extend(config, {
-    modules: [
-      { name: 'new module override' }
-    ]
-  }, {
-    'modules': 'EXTEND',
-    'modules.*': 'EXTEND',
-    'modules.*.*': 'REPLACE'
-  });
+        server.on(function(req, res, next) {
+          res.writeHead(200, { 'Content-Type': 'text/plain' });
+          res.end('zoe.js server');
+        });
 
-  console.log(config);
-  config.modules[0].name;
-```
-
-_modules.0.name gets replaced by modules.0.name._
-
-* The 'EXTEND' rule is just zoe.extend itself. We could have written zoe.extend instead of 'EXTEND'.
-* The 'modules' and 'modules.*' could be left out as the wildcard usage would add these rules by default.
-
+        http.createServer(server).listen(80);
+      ```
+      * The above demonstrates using the [`zoe.fn.ASYNC`](#zoe.fn.ASYNC) step function chain to create a NodeJS server.
+      * Each function is run, with the last argument provided as the `next` callback to execute the next function.
+      * For running asynchronous functions in parallel, use the [`zoe.fn.ASYNC_SIM`](#zoe.fn.ASYNC_SIM) execution function.
 
         """
       ,
-        sectionName: 'Stored Object Rules'
+        sectionName: 'Function Chains for Eventing'
         markdown: """
 
-```jslive
-  var config = {
-    _extend: {
-      modules: 'ARR_APPEND',
-      'settings.*': 'REPLACE'
-    },
-    modules: [
-      { name: 'first', data: {} },
-      { name: 'second', data: {} }
-    ],
-    settings: {
-      some_option: 'setting'
-    }
-  };
+      ```jslive
+        var Button = zoe.create([zoe.Constructor, zoe.InstanceEvents], {
+          _events: ['click'],
+          construct: function(name) {
+            this.name = name;
+          },
+          prototype: {
+            click: function() {
+              alert('clicked ' + this.name);
+            }
+          }
+        });
 
-  zoe.extend(config, {
-    _extend: {
-      another: 'REPLACE'
-    },
-    modules: [ { name: 'new module', data: {} } ],
-    settings: {
-      a_new: 'option'
-    },
-    another: 'config type'
-  });
+        var button1 = new Button('button1');
+        var button2 = new Button('button2');
 
-  console.log(config);
-  config.modules.length;
-```
+        button1.click.on(function() {
+          alert('button 1 click hook!');
+        });
 
-_Modules are appended, settings are replaced, 'another' property is by default set to be overridden by any extending
-properties._
+        button1.click();
+        button2.click();
 
-* '_extend' rules only apply when a rule parameter is not given.
-* Rules from the extending object are automatically appended to the base object rules and used.
+        // because the chain is automatically bound to the instance
+        // we can easily attach triggers to other objects
+        // while maintaining the 'this' scope
+        // (apologies for annoyance with this - reload the window if you must!)
+        window.addEventListener('dblclick', button1.click);
+      ```
 
+      * The [`zoe.InstanceEvents`](#zoe.InstanceEvents) implementor checks the `_events` property on the constructor for which functions to create as events.
+      * It then effectively adds the line `this.click = zoe.fn([this.click]).bind(this)` to the constructor.
+      * This creates a new function chain on the instance, which provides an event system unique to the instance.
         """
       ,
-        sectionName: 'Function Chains by Extension'
+        sectionName: 'Advanced Extension Rules'
         markdown: """
 
-```jslive
-  var config = {
-    _extend: {
-      'modules': 'ARR_APPEND',
-      'settings.*': 'REPLACE',
-      'onLoad': 'CHAIN'
-    },
-    modules: [
-      { name: 'first', data: {} },
-      { name: 'second', data: {} }
-    ],
-    settings: {
-      some_option: 'setting'
-    },
-    onLoad: function() {
-      alert('load');
-    }
-  };
+      ```jslive
+        var config = {
+          modules: [
+            { name: 'first', data: 'here' },
+            { name: 'second', data: '' }
+          ],
+          settings: {
+            some_option: 'setting'
+          }
+        };
 
-  zoe.extend(config, {
-    onLoad: function() {
-      alert('load hook');
-    }
-  });
+        var newConfig = {
+          modules: [
+            { name: 'first module renamed' }
+          ],
+          settings: {
+            another_option: 'my_option'
+          }
+        }
 
-  console.log(config);
-  config.onLoad();
-```
+        var rules = {
+          'modules.*.*': 'REPLACE',
+          'settings': 'EXTEND'
+        };
 
-_The onLoad method is chained to execute both functions one after another._
+        zoe.extend(config, newConfig, rules);
 
-config.onLoad also exposes a function config.onLoad.on(function() { ... }) for adding new events. This is the eventing system provided by zoe.fn.
+        config.modules[0].name;
+      ```
 
-        """
-      ,
-        sectionName: 'Classes by Extension'
-        markdown: """
+      * Rules-based extension is provided by [`zoe.extend`](#zoe.extend), which is directly used by `zoe.create` for inheritance.
+      * In the above example, the modules data is replace-merged over the existing data.
+      * If an `_extend` property is provided on an object, that will be used instead of the last rules parameter.
+      * Various extension rules allow for the expected extension of objects, with flexibility for many use cases such as
+        deep copying ([`zoe.extend.DREPLACE`](#zoe.extend.DREPLACE)) and setting defaults ([`zoe.extend.PREPEND`](#zoe.extend.PREPEND)).
+      * Just like the function chain execution functions, any custom extension rules can be provided.
 
-```jslive
-  var Ball = {
-    _extend: {
-      'attributes.*': 'REPLACE'
-    },
-    attributes: {
-      radius: 5,
-      color: 'red'
-    }
-  };
-
-  var Bounce = {
-    _extend: {
-      'bounce': 'CHAIN'
-    },
-    bounce: function() {
-      alert('bouncing');
-    }
-  };
-
-  var myBall = zoe.create([Ball, Bounce], {
-    attributes: {
-      radius: 10,
-      color: 'green'
-    },
-    bounce: function() {
-      alert(this.attributes.color);
-    }
-  });
-
-  console.log(myBall);
-  myBall.bounce();
-```
-
-$z.create extends a new object with each of the implementors in turn. In this
-case $z.create would do exactly the following:
-
-```javascript
-  var myBall = {};
-
-  zoe.extend(myBall, Ball);
-  zoe.extend(myBall, Bounce)
-  zoe.extend(myBall, {
-    attributes: {
-      radius: 10,
-      color: 'green'
-    },
-    bounce: function() {
-      alert(this.attributes.color);
-    }
-  });
-```
-
-Since the definitions themselves are never modified, they can be used again in other zoe.create calls.
-
-We thus have an extension-based class system.
-
-        """
-      ,
-        sectionName: 'Prototypal Classes'
-        markdown: """
-
-```jslive
-  var Constructor = {
-    _base: function() {
-      return function constructor() {}
-    },
-    _extend: {
-      prototype: 'EXTEND'
-    }
-  };
-
-  var PrototypeClass = zoe.create([Constructor], {
-    prototype: {
-      my: 'prototype property'
-    }
-  });
-
-  console.dir(PrototypeClass);
-  (new PrototypeClass()).my;
-```
-
-Since the prototype is just an object on a main function, we extend it just like another property.
-The '_base' property sets the initial object as a new function which is then extended providing natural JavaScript
-prototype behavior.
-
-zoe.Constructor provides this functionality (it's just like the Constructor above but with 16 extra lines of code).
-
-### Standard Prototype Class Usage
-
-```jslive
-  var PrototypeClass = $z.create([zoe.Constructor], {
-    _extend: {
-      'prototype.sayHello': 'CHAIN'
-    },
-    construct: function() {
-      console.log('constructing!');
-    },
-    prototype: {
-      sayHello: function() {
-        alert('world');
-        return 'return val';
-      }
-    }
-  });
-
-  console.dir(PrototypeClass);
-  (new PrototypeClass()).sayHello();
-```
-
-        """
-      ,
-        sectionName: 'Extending Native JavaScript Classes'
-        markdown: """
-
-```jslive
-  var NativePrototype = function() {
-    alert('constructing native');
-  }
-  NativePrototype.prototype.native = true;
-
-  var MyPrototype = $z.create([zoe.Constructor, NativePrototype], {
-    constructor: function() {
-      alert('constructing zoe prototype');
-    },
-    prototype: {
-      zoe: true
-    }
-  });
-
-  var instance = new MyPrototype();
-  console.log(instance);
-  instance.zoe && instance.native;
-```
-
-        """
-      ,
-        sectionName: 'Prototype Classes with Inheritance and Eventing'
-        markdown: """
-
-```jslive
-  var Shark = zoe.create([zoe.Constructor, zoe.InstanceChains], {
-    _extend: {
-      'prototype.eat': 'CHAIN'
-    },
-    construct: function(name) {
-      this.name = name;
-    },
-    prototype: {
-      eat: function(food) {
-        alert(this.name + ' ate ' + food);
-      }
-    }
-  });
-
-  var GreatWhite = zoe.create([Shark], {
-    construct: function(name) {
-      this.terrorize();
-    },
-    prototype: {
-      terrorize: function() {
-        alert(this.name + ' approached the beach');
-      },
-      eat: function() {
-        alert('there was much blood');
-      }
-    }
-  });
-
-  var myGreatWhite = new GreatWhite('Nibbles');
-  myGreatWhite.eat.on(function() {
-    alert('oh dear');
-  });
-  myGreatWhite.eat('a surfer');
-  console.log(myGreatWhite);
-```
-
-When we use the `on` method of `myGreatWhite`, we add a new function to the chain.
-Typically this function chain would be on the object prototype so we would be modifying the prototype.
-By implementing `zoe.InstanceChains`, all prototype function chains are reinstantiated for the instance so that
-the prototype is not modified. The `this` reference is also bound to the prototype instance giving them portability
-to be used in other callers (eg `$(someElement).bind('click', this.eat);`).
-
-***
+      ***
         """
       ]
     ,
@@ -522,8 +379,6 @@ to be used in other callers (eg `$(someElement).bind('click', this.eat);`).
   
   #### Eventing Example:
   
-  > This is a live code example. Click 'run' to execute the code. You can also edit the code in this box if you wish to change it.
-  
   ```jslive
     var clickEvent = zoe.fn();
     
@@ -564,8 +419,6 @@ to be used in other callers (eg `$(someElement).bind('click', this.eat);`).
     when to run them, with what arguments and scope, and what final output to provide.
       
     #### Example:
-    
-    > This is a live code example. Click 'run' to execute the code. You can also edit the code in this box if you wish to change it.
     
     ```jslive
       var EXECUTE_LAST_ONLY = function(self, args, fns) {
@@ -671,33 +524,6 @@ to be used in other callers (eg `$(someElement).bind('click', this.eat);`).
       })
     ('howdy');
   ```
-  
-  #### Example - NodeJS Server Handler:
-  
-  Server handlers in NodeJS are also simply step functions of this form. Thus we can write a server in NodeJS as:
-  
-  ```javascript
-    var http = require('http');
-    
-    http.createServer(
-      zoe.fn('ASYNC')
-      .on(function(req, res, next) {
-        if (req.headers['Content-Type'].indexOf('application/json') != -1) {
-          //handle an application request
-        }
-        else
-          next();
-      })
-      .on(function(req, res, next) {
-        if (req.url == '/') {
-          //handle a page request
-        }
-      })
-    ).listen(8080);
-  ```
-  
-  Handlers can then also be added and removed dynamically at runtime.
-  
         """
       ,
         sectionName: 'zoe.fn.ASYNC_SIM'
@@ -921,7 +747,7 @@ to be used in other callers (eg `$(someElement).bind('click', this.eat);`).
         'property': Extension Rule
         'property.sub_property': Deep Extension Rule
         '*': Wildcard Rule
-        '*.*': Deep Wildcard Rule
+        'obj.*': Deep Wildcard Rule
       }
     ```
     
@@ -931,7 +757,8 @@ to be used in other callers (eg `$(someElement).bind('click', this.eat);`).
     * When a property has sub rules (specified by a '.'), the rule map for the property is derived and passed as the third
       parameter to the extension function for that property. By using `zoe.extend` (or just `'EXTEND'`), this allows
       deep object extension as it conforms to the rule function specification itself.
-    * Deep wildcard rules are passed down to all property rule maps, to be used just as normal wildcards at each level.
+    * Deep wildcard rules enforce the EXTEND rule on any sub properties which have no rule. For example, if `obj` in the above
+      rule had no extension rule, EXTEND would be used by default.
     
   #### Example
   
@@ -1289,6 +1116,12 @@ to be used in other callers (eg `$(someElement).bind('click', this.eat);`).
   _Adds the function to a zoe.fn chain on objA, with the enforced execution function zoe.fn.STOP_DEFINED._
         """
       ,
+        sectionName: 'zoe.extend.CHAIN_ASYNC'
+        markdown: """
+
+  _Allows for asynchronous function chains (functions where the last argument is a 'next' callback) to be combined through extension._
+        """
+      ,
         sectionName: 'zoe.extend.makeChain'
         markdown: """
   Any zoe.fn execution function can be converted into a zoe.extend chain extension function.
@@ -1564,17 +1397,18 @@ to be used in other callers (eg `$(someElement).bind('click', this.eat);`).
   ```
         """
       ,
-        sectionName: 'zoe.InstanceChains'
+        sectionName: 'zoe.InstanceEvents'
         markdown: """
 
   _An inheritor to be included after `zoe.Constructor` that reinstantiates and binds any `zoe.fn`'s from the prototype to the instance. This allows events to be attached to an instance without affecting the prototype, while still allowing initial event attachments from the prototype._
 
-  On construction, it searches through the prototype for any `zoe.fn` instances, and when found they are recreated and bound to the instance with: `this.fn = zoe.fn(this.fn).bind(this)`.
+  On construction, it searches through the '_events' array and binds them to the instance with: `this.evt = zoe.fn(this.evt).bind(this)`.
 
   #### Example
 
   ```jslive
-    var myClass = zoe.create([zoe.Constructor, zoe.InstanceChains], {
+    var myClass = zoe.create([zoe.Constructor, zoe.InstanceEvents], {
+      _events: ['event'],
       prototype: {
         __event: function() {
           alert('base event chain');
@@ -1590,7 +1424,8 @@ to be used in other callers (eg `$(someElement).bind('click', this.eat);`).
       alert('instance 1 event');
     });
 
-    // events can be added to the prototype, affecting all instances
+    // because the `__` append rule is used above, the prototype event 
+    // property is also a chain, affecting all instances of the prototype
     myClass.prototype.event.on(function() {
       alert('extra base event');
     });
