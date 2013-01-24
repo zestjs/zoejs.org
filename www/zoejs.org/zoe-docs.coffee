@@ -195,6 +195,7 @@ zoe.js is provided under the MIT license.
         ```
 
         * [`zoe.Constructor`](#zoe.Constructor) is identical to the above Constructor, with only 14 additional lines of code.
+        * The `_base` property allows setting the initial object factory function for generating the object to be extended during the creation process.
         * By providing the extension rules for creating a JavaScript constructor, all future inheritors
           are able to set the `prototype` and `construct` properties resulting in the expected extension.
         * `zoe.Constructor` also supports implementing from native JavaScript constructors.
