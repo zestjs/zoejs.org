@@ -358,8 +358,9 @@ zoe.js is provided under the MIT license.
   ### Usage:
   
   ```javascript
-    var f = zoe.fn(executionFunction);
+    var f = zoe.fn([initialFunctions], executionFunction);
   ```
+    * **initialFunctions, Array** (optional): _An array of functions to provide as the intial function chain array._
     * **executionFunction, string / function** (optional): _the main execution function to handle function execution and output
        when no executionFunction is provided. Defaults to [`zoe.fn.LAST_DEFINED`](#zoe.fn.LAST_DEFINED). When a string `FUNCTION_NAME` is provided, the function is loaded from `zoe.fn.FUNCTION_NAME`. These provided execution functions are detailed below._
       
@@ -423,7 +424,7 @@ zoe.js is provided under the MIT license.
     
     ```jslive
       var EXECUTE_LAST_ONLY = function(self, args, fns) {
-        fns[fns.length - 1].call(self, args);
+        fns[fns.length - 1].apply(self, args);
       }
       
       var f = zoe.fn(EXECUTE_LAST_ONLY);
