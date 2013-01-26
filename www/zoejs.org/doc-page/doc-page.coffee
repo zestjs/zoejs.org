@@ -1,9 +1,9 @@
 define [
-  'com!cs!../page/page'
+  'cs!../page/page'
 
-  'com!cs!./sidebar'
-  'com!cs!./contents'
-  'com!cs!./documentation'
+  'cs!./sidebar'
+  'cs!./contents'
+  'cs!./documentation'
 ], (Page, Sidebar, Contents, Docs) ->
   render: Page
   options:

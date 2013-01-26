@@ -1,7 +1,6 @@
 modules: ['cs!$/zoejs.org']
 
-port: 80
-hostname: '176.67.165.252'
+port: 8083
 fileExpires: 10000
 
 404: 
@@ -31,7 +30,10 @@ require:
   map:
     '*':
       selector: 'jquery'
+  build:
+    optimize: 'none'
 
 zestLayer:
-  include: ['cs!site/zoe-docs', 'cs!site/doc-page/documentation.controller', 'cs!site/doc-page/contents.controller']
-  excludeShallow: ['require-css/css-builder', 'require-less/lessc-server']
+  include: [
+    '^!cs!site/zoe-docs'
+  ]
