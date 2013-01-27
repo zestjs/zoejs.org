@@ -6,7 +6,7 @@ define [], () ->
 
   page:
     meta: """<meta name="viewport" content="width=device-width">"""
-    tracking: """
+    footer: """
    <script type="text/javascript">
 
   var _gaq = _gaq || [];

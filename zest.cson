@@ -1,6 +1,7 @@
 modules: ['cs!$/zoejs.org']
 
-port: 8083
+hostname: '176.67.165.252'
+port: 80
 fileExpires: 10000
 
 404: 
@@ -30,8 +31,8 @@ require:
   map:
     '*':
       selector: 'jquery'
-  build:
-    optimize: 'none'
+  #build:
+  #  optimize: 'none'
 
 zestLayer:
   include: [
