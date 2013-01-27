@@ -542,12 +542,12 @@ zoe.js is provided under the MIT license.
   
     f.on(function(done) {
       alert('first starting');
-      setTimeout(next, 3000);
+      setTimeout(done, 3000);
     });
   
     f.on(function(done) {
       alert('second starting');
-      setTimeout(next, 500);
+      setTimeout(done, 500);
     });
   
     f(function() {
