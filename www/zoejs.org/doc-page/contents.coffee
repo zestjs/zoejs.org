@@ -40,3 +40,4 @@ define ['cs!../page/line-break', 'less!./contents'], (LineBreak) ->
   ]
     
   attach: 'cs!./contents.controller'
+  attachAsync: true
