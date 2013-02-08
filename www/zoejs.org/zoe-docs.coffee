@@ -11,7 +11,7 @@ define ['cs!./doc-page/doc-page', 'zoe', 'zest/com'], (DocPage, zoe) ->
 
         zoe.js provides natural JavaScript multiple inheritance based on object extension, fully compatible with prototypal inheritance.
 
-        Used by the [ZestJS render component framework](http://zestjs.org).
+        ZOE is an acronym for Zest Object Extension and was created while developing [ZestJS](http://zestjs.org), a modular widget rendering framwork built on top of RequireJS.
 
         """
       ,
